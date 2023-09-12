@@ -3,7 +3,7 @@
 ```bash
 sudo apt install --reinstall linux-headers-$(uname -r)
 ```
-### Run hello world
+### Run hello world program
 ```bash
 insmod hello.ko
 dmesg
