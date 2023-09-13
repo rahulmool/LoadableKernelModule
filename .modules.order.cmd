@@ -1,0 +1,1 @@
+cmd_/home/mool/Documents/LoadableKernelModule/LoadableKernelModule/modules.order := {   echo /home/mool/Documents/LoadableKernelModule/LoadableKernelModule/defender.o; :; } > /home/mool/Documents/LoadableKernelModule/LoadableKernelModule/modules.order

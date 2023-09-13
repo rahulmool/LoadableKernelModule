@@ -12,51 +12,61 @@ MODULE_AUTHOR("Your Name");
 MODULE_DESCRIPTION("Kernel Module to Get Actual CPU Frequencies for All CPUs");
 MODULE_VERSION("0.1");
 
+uint64_t msr_value(int64_t val,uint64_t plane)
+{
+	//0.5 is to deal with rounding
+	val=(val*1024/1000);
+	val=0xFFE00000&((val&0xFFF)<<21);
+	val=val|0x8000001100000000;
+	val=val|(plane<<40);
+	return (uint64_t)val;
+}
+
 int getfreqoffset(int freq){
-        if(0<=freq && freq<=650){           return -128;//assume
-        }else if(650<=freq && freq<=750){   return -128;//crash
-        }else if(750<=freq && freq<=850){   return -123;//crash
-        }else if(850<=freq && freq<=950){   return -128;//crash
-        }else if(950<=freq && freq<=1500){  return -113;//crash
-        }else if(1050<=freq && freq<=1150){ return -116;//crash
-        }else if(1150<=freq && freq<=1250){ return -117;
-        }else if(1250<=freq && freq<=1350){ return -113;
-        }else if(1350<=freq && freq<=1450){ return -113;
-        }else if(1450<=freq && freq<=1550){ return -100;
-        }else if(1550<=freq && freq<=1650){ return -101;
-        }else if(1650<=freq && freq<=1750){ return -101;
-        }else if(1750<=freq && freq<=1850){ return -99; 
-        }else if(1850<=freq && freq<=1950){ return -87; 
-        }else if(1950<=freq && freq<=2050){ return -87; 
-        }else if(2050<=freq && freq<=2150){ return -85; 
-        }else if(2150<=freq && freq<=2250){ return -87; 
-        }else if(2250<=freq && freq<=2350){ return -83; 
-        }else if(2350<=freq && freq<=2450){ return -86; 
-        }else if(2450<=freq && freq<=2550){ return -90; 
-        }else if(2550<=freq && freq<=2650){ return -94; 
-        }else if(2650<=freq && freq<=2750){ return -97; 
-        }else if(2750<=freq && freq<=2850){ return -98; 
-        }else if(2850<=freq && freq<=2950){ return -100;
-        }else if(2950<=freq && freq<=3050){ return -104;
-        }else if(3050<=freq && freq<=3150){ return -105;
-        }else if(3150<=freq && freq<=3250){ return -108;
-        }else if(3250<=freq && freq<=3350){ return -106;
-        }else if(3350<=freq && freq<=3450){ return -121;
-        }else if(3450<=freq && freq<=3550){ return -130;
-        }else if(3550<=freq && freq<=3650){ return -134;
-        }else if(3650<=freq && freq<=3750){ return -139;
-        }else if(3750<=freq && freq<=3850){ return -143;
-        }else if(3850<=freq && freq<=3950){ return -153;
-        }else if(3950<=freq && freq<=4050){ return -154;
-        }else if(4050<=freq && freq<=4150){ return -156;
-        }else if(4150<=freq && freq<=4250){ return -159;
-        }else if(4250<=freq && freq<=4350){ return -163;//crash
-        }else if(4350<=freq && freq<=4450){ return -138;//crash
-        }else if(4450<=freq && freq<=4550){ return -139;//crash
-        }else if(4550<=freq && freq<=4650){ return -152;//crash
-        }else if(4650<=freq && freq<=4750){ return -151;//crash
-        }else if(4750<=freq && freq<=4850){ return -151;//assume
-        }else if(4850<=freq && freq<=4950){ return -151;//assume
+        if(0<=freq && freq<=650){           return -98;//assume
+        }else if(650<=freq && freq<=750){   return -98;//crash
+        }else if(750<=freq && freq<=850){   return -93;//crash
+        }else if(850<=freq && freq<=950){   return -98;//crash
+        }else if(950<=freq && freq<=1500){  return -83;//crash
+        }else if(1050<=freq && freq<=1150){ return -86;//crash
+        }else if(1150<=freq && freq<=1250){ return -87;
+        }else if(1250<=freq && freq<=1350){ return -83;
+        }else if(1350<=freq && freq<=1450){ return -83;
+        }else if(1450<=freq && freq<=1550){ return -70;
+        }else if(1550<=freq && freq<=1650){ return -71;
+        }else if(1650<=freq && freq<=1750){ return -71;
+        }else if(1750<=freq && freq<=1850){ return -69; 
+        }else if(1850<=freq && freq<=1950){ return -57; 
+        }else if(1950<=freq && freq<=2050){ return -57; 
+        }else if(2050<=freq && freq<=2150){ return -55; 
+        }else if(2150<=freq && freq<=2250){ return -57; 
+        }else if(2250<=freq && freq<=2350){ return -53; 
+        }else if(2350<=freq && freq<=2450){ return -56; 
+        }else if(2450<=freq && freq<=2550){ return -60; 
+        }else if(2550<=freq && freq<=2650){ return -64; 
+        }else if(2650<=freq && freq<=2750){ return -67; 
+        }else if(2750<=freq && freq<=2850){ return -68; 
+        }else if(2850<=freq && freq<=2950){ return -70;
+        }else if(2950<=freq && freq<=3050){ return -74;
+        }else if(3050<=freq && freq<=3150){ return -75;
+        }else if(3150<=freq && freq<=3250){ return -78;
+        }else if(3250<=freq && freq<=3350){ return -76;
+        }else if(3350<=freq && freq<=3450){ return -91;
+        }else if(3450<=freq && freq<=3550){ return -100;
+        }else if(3550<=freq && freq<=3650){ return -104;
+        }else if(3650<=freq && freq<=3750){ return -109;
+        }else if(3750<=freq && freq<=3850){ return -113;
+        }else if(3850<=freq && freq<=3950){ return -123;
+        }else if(3950<=freq && freq<=4050){ return -124;
+        }else if(4050<=freq && freq<=4150){ return -126;
+        }else if(4150<=freq && freq<=4250){ return -129;
+        }else if(4250<=freq && freq<=4350){ return -133;//crash
+        }else if(4350<=freq && freq<=4450){ return -108;//crash
+        }else if(4450<=freq && freq<=4550){ return -109;//crash
+        }else if(4550<=freq && freq<=4650){ return -122;//crash
+        }else if(4650<=freq && freq<=4750){ return -121;//crash
+        }else if(4750<=freq && freq<=4850){ return -121;//assume
+        }else if(4850<=freq && freq<=4950){ return -121;//assume
         } 
         pr_info("Failed to read %u\n", freq);
         return -1;
@@ -165,11 +175,12 @@ static int my_thread(void *data) {
         // Your code goes here
         // pr_info("Kernel module is running...\n");
         // msleep(1000); // Sleep for 1 second
-        p = maximumoffset() + 50;
+        p = maximumoffset() + 20;
         if (plane0offset() < p)
         {
-            wrmsr_on_cpu(0, 0x150, (u32)(0x80000011fec00000 & 0xFFFFFFFF), (u32)(0x80000011fec00000 >> 32));
             pr_info("offset is %lld,p is %d\n", plane0offset(),p);
+            wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,0) & 0xFFFFFFFF), (u32)(msr_value(p,0) >> 32));
+            wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,2) & 0xFFFFFFFF), (u32)(msr_value(p,2) >> 32));
             // msleep(1000);
         }
     }
