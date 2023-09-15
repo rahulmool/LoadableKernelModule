@@ -5,6 +5,7 @@
 #include <linux/delay.h>
 #include <linux/sched.h>
 #include <linux/kthread.h>
+#define MSR_IA32_PERF_STATUS2 0x198 // MSR for reading CPU frequency
 
 
 MODULE_LICENSE("GPL");
@@ -74,62 +75,28 @@ int getfreqoffset(int freq){
 
 int maximumoffset(void)
 {
-    unsigned int cpu;
-    char freq_file_path[64];
-    char freq_buf[32];
-    struct file *file;
-    int len;
     int maxoffset = -1;
-    int ret, t,i;
-    int int_value;
-    for_each_possible_cpu(cpu)
-    {
-        int_value = 0;
-        snprintf(freq_file_path, sizeof(freq_file_path), "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", cpu);
-
-        // Open the frequency file for reading
-        file = filp_open(freq_file_path, O_RDONLY, 0);
-        if (IS_ERR(file))
-        {
-            pr_err("Failed to open %s\n", freq_file_path);
-            continue;
+    unsigned int cpu;
+    unsigned int freq;
+    int t;
+    
+    for_each_online_cpu(cpu) {
+        u64 msr_value;
+        rdmsrl_on_cpu(cpu, MSR_IA32_PERF_STATUS2, &msr_value);
+        
+        // Extract frequency information from the MSR value
+        freq = (msr_value >> 8) & 0xFF;
+        if(cpu==0){
+            maxoffset=getfreqoffset(freq*100);
+        }else{
+            t=getfreqoffset(freq*100);
+            if(maxoffset<t){
+                maxoffset=t;
+            }
         }
 
-        // Read CPU frequency
-        len = kernel_read(file, freq_buf, sizeof(freq_buf), &file->f_pos);
-        if (len < 0)
-        {
-            pr_err("Failed to read %s\n", freq_file_path);
-            filp_close(file, NULL);
-            continue;
-        }
-
-        // Null-terminate the buffer
-        freq_buf[len - 1] = '\0';
-
-        // Print the CPU frequency for this CPU
-
-        // Use simple_strtoul to convert the string to an integer
-        // pr_info("String: %s\n", freq_buf);
-        for(i=0;i<len-1;i++){
-            int_value = int_value*10 + freq_buf[i] - '0';
-        }
-        // ret = kstrtouint(freq_buf, len, &int_value);
-        //pr_info("Integer: %u\n", int_value);
-        t = getfreqoffset(int_value/1000);
-        //pr_info("offset is %u,%d,maxoffset=%d,%u/n", t,t,maxoffset,maxoffset);
-        if (t < maxoffset )
-        {
-            maxoffset = t;
-          //              pr_info("maxoffset is %d",maxoffset);
-
-        }
-        // pr_info("CPU %u Frequency: %u kHz\n", cpu, freq_buf);
-
-        // Close the file
-        filp_close(file, NULL);
+        // pr_info("CPU%u Frequency: %u MHz\n", cpu, freq);
     }
-    // pr_info("maxoffset is %d\n", maxoffset);
     return maxoffset;
 }
 int64_t unpack_offset(uint64_t msr_response)
@@ -169,14 +136,15 @@ int64_t plane0offset(void)
 }
 
 static int my_thread(void *data) {
-             int p;
+             int p,k;
 
     while (!kthread_should_stop()) {
         // Your code goes here
         // pr_info("Kernel module is running...\n");
         // msleep(1000); // Sleep for 1 second
         p = maximumoffset() + 20;
-        if (plane0offset() < p)
+        k=plane0offset();
+        if (k < p)
         {
             pr_info("offset is %lld,p is %d\n", plane0offset(),p);
             wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,0) & 0xFFFFFFFF), (u32)(msr_value(p,0) >> 32));
