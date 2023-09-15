@@ -69,7 +69,7 @@ int getfreqoffset(int freq){
         }else if(4750<=freq && freq<=4850){ return -121;//assume
         }else if(4850<=freq && freq<=4950){ return -121;//assume
         } 
-        pr_info("Failed to read %u\n", freq);
+        //pr_info("Failed to read %u\n", freq);
         return -1;
 }
 
@@ -146,7 +146,7 @@ static int my_thread(void *data) {
         k=plane0offset();
         if (k < p)
         {
-            pr_info("offset is %lld,p is %d\n", plane0offset(),p);
+            //pr_info("offset is %lld,p is %d\n", plane0offset(),p);
             wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,0) & 0xFFFFFFFF), (u32)(msr_value(p,0) >> 32));
             wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,2) & 0xFFFFFFFF), (u32)(msr_value(p,2) >> 32));
             // msleep(1000);
@@ -176,7 +176,7 @@ static int __init get_cpu_freq_init(void)
     //         // msleep(1000);
     //     }
     // }
-        pr_info("Module initialization\n");
+        //pr_info("Module initialization\n");
 
     // Create a kernel thread that runs your loop
     thread = kthread_run(my_thread, NULL, "my_thread");
@@ -191,7 +191,7 @@ static int __init get_cpu_freq_init(void)
 
 static void __exit get_cpu_freq_exit(void)
 {
-    pr_info("Exiting...\n");
+    //pr_info("Exiting...\n");
 }
 
 module_init(get_cpu_freq_init);

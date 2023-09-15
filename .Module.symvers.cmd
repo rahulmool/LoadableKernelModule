@@ -1,0 +1,1 @@
+cmd_/home/mool/Documents/LoadableKernelModule/LoadableKernelModule/Module.symvers :=  scripts/mod/modpost -m -a     -o /home/mool/Documents/LoadableKernelModule/LoadableKernelModule/Module.symvers -T /home/mool/Documents/LoadableKernelModule/LoadableKernelModule/modules.order -i Module.symvers -e 
