@@ -150,6 +150,9 @@ static int my_thread(void *data) {
             wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,0) & 0xFFFFFFFF), (u32)(msr_value(p,0) >> 32));
             wrmsr_on_cpu(0, 0x150, (u32)(msr_value(p,2) & 0xFFFFFFFF), (u32)(msr_value(p,2) >> 32));
             // msleep(1000);
+        }else{
+            wrmsr_on_cpu(0, 0x150, (u32)(msr_value(-2,2) & 0xFFFFFFFF), (u32)(msr_value(-2,2) >> 32));
+            
         }
     }
 
